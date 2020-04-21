@@ -9,6 +9,7 @@ const dotenv = require("dotenv");
 
 //load dotenv
 require("dotenv").config();
+
 const API_PORT = process.env.API_PORT || 3000;
 const USERNAME = process.env.DB_USER;
 const PASSWORD = process.env.DB_PASSWORD;
@@ -38,9 +39,13 @@ app.use(logger("dev"));
 
 //get method
 //fetches all data from database
-router.get("getData", (req, res) => {
+router.get("/getData", (req, res) => {
   Data.find((err, data) => {
-    if (err) return res.json({ success: false, error: err });
+    if (err)
+      return res.json(
+        { success: false, error: err },
+        console.log("error in getData")
+      );
     return res.json({ success: true, data: data });
   });
 });
@@ -50,14 +55,14 @@ router.get("getData", (req, res) => {
 router.post("/updateData", (req, res) => {
   const { id, update } = req.body;
   Data.findByIdAndUpdate(id, update, (err) => {
-    if (err) return res.json({ sucess: false, error: err });
-    return res.json({ succes: true });
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true });
   });
 });
 
 //delete method
 //remove existing
-router.delete("./deleteData", (req, res) => {
+router.delete("/deleteData", (req, res) => {
   const { id } = req.body; //req.body to get information - for the methods
   Data.findByIdAndRemove(id, (err) => {
     if (err) return res.send(err);
