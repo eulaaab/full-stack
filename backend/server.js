@@ -64,7 +64,7 @@ router.post("/updateData", (req, res) => {
 //remove existing
 router.delete("/deleteData", (req, res) => {
   const { id } = req.body; //req.body to get information - for the methods
-  Data.findByIdAndRemove(id, (err) => {
+  Data.findByIdAndDelete(id, (err) => {
     if (err) return res.send(err);
     return res.json({ success: true });
   });

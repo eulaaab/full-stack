@@ -9,7 +9,7 @@ class App extends Component {
     id: 0,
     message: null,
     intervalIsSet: false,
-    idtoDelete: null,
+    idToDelete: null,
     idToUpdate: null,
     objectToUpdate: null,
   };
@@ -18,7 +18,7 @@ class App extends Component {
     this.getData();
     //polling logic check fresh data at set interval, every second
     if (!this.state.intervalIsSet) {
-      let interval = setInterval(this.getData, 60000);
+      let interval = setInterval(this.getData, 600000);
       this.setState({ intervalIsSet: interval });
     }
   }
@@ -47,15 +47,12 @@ class App extends Component {
         id: idToBeAdded,
         message: message,
       })
-      .then(
-        ((res) => {
-          console.log("message posted", alert("message posted in DB"));
-          document.querySelector("input").value = "";
-        },
-        (err) => {
-          console.log(err, "error in putData");
-        })
-      );
+      .then((res) => {
+        console.log("message posted", window.alert("message posted in DB"));
+      })
+      .catch((err) => {
+        console.log(err, "error in putData");
+      });
   };
 
   updateData = (idToUpdate, updateToApply) => {
@@ -64,29 +61,37 @@ class App extends Component {
     parseInt(idToUpdate);
     this.state.data.forEach((item) => {
       if (item.id == idToUpdate) {
-        objIdToUpdate = item.id;
+        objIdToUpdate = item._id; //the Objectid
       }
     });
-    axios.post(`${API_URL}/api/updateData`, {
-      id: objIdToUpdate,
-      update: { message: updateToApply },
-    });
+    axios
+      .post(`${API_URL}/api/updateData`, {
+        id: objIdToUpdate,
+        update: { message: updateToApply },
+      })
+      .then((res) => {
+        console.log("message updated", window.alert("message updated in DB"));
+      });
   };
 
   deleteData = (idToDelete) => {
-    parseInt(idToDelete);
     let objIdToDelete = null;
-    this.state.data.forEach((data) => {
-      if (data.id == idToDelete) {
-        //put the id to delet as variable
-        objIdToDelete = data._id;
+    parseInt(idToDelete);
+    this.state.data.forEach((item) => {
+      if (item.id == idToDelete) {
+        //put the objectId to delete as variable
+        objIdToDelete = item._id;
       }
     });
-    axios.delete(`${API_URL}/api/deleteData`, {
-      data: {
-        id: objIdToDelete,
-      },
-    });
+    axios
+      .delete(`${API_URL}/api/deleteData`, {
+        data: {
+          id: idToDelete,
+        },
+      })
+      .then((res) => {
+        console.log("message deleted", window.alert("message deleted in DB"));
+      });
   };
 
   //clearInterval to stop time
@@ -109,7 +114,7 @@ class App extends Component {
               : data.map((item) => (
                   <li style={{ padding: "10px" }} key={item.message}>
                     <span style={{ color: "gray" }}>id:</span>
-                    {item._id}
+                    {item.id}
                     <span style={{ color: "gray" }}>message: </span>
                     {item.message}
                   </li>
@@ -126,7 +131,6 @@ class App extends Component {
               className="input"
               onChange={(e) => {
                 e.preventDefault();
-
                 this.setState({ message: e.target.value });
               }}
             />
@@ -145,7 +149,7 @@ class App extends Component {
               className="input"
               onChange={(e) => this.setState({ idToDelete: e.target.value })}
             />
-            <button onClick={() => this.deleteData(this.state.idtoDelete)}>
+            <button onClick={() => this.deleteData(this.state.idToDelete)}>
               DELETE
             </button>
           </div>
